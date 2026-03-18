@@ -1,6 +1,19 @@
+# Środowisko wirtualne 
+venv/
+
+# Pliki konfiguracyjne IDE
 .idea/
+.vscode/
+
+# Tajne dane (Klucze AWS, hasła)
+.env
+
+# Pliki tymczasowe Pythona
 __pycache__/
 *.pyc
 src/__pycache__/
+
+# Dane i logi (lepiej trzymać je lokalnie)
+data/
+*.log
 src/charts/
-.env

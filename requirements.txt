@@ -1,0 +1,20 @@
+# Biblioteka do zapytań HTTP (pobieranie danych z API NBP)
+requests
+
+# Podstawowa biblioteka do obróbki danych
+pandas
+
+# Integracja z AWS S3 i formatem Parquet (najlepsza dla Data Engineers)
+awswrangler
+
+# Oficjalny SDK AWS (wymagany przez awswrangler do poświadczeń)
+boto3
+
+# Silnik OLAP do analizy danych S3 przy użyciu SQL
+duckdb
+
+# Generowanie wykresów i wizualizacja danych
+matplotlib
+
+# Obsługa zmiennych środowiskowych z pliku .env (bezpieczeństwo)
+python-dotenv
