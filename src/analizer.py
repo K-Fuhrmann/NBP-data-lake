@@ -2,31 +2,31 @@ import duckdb
 
 
 def run_analysis():
-    print("--- ANALIZA DANYCH S3 (BEZPIECZNA KONFIGURACJA) ---")
+    print("--- S3 DATA ANALYSIS (SECURE CONFIGURATION) ---")
 
     con = duckdb.connect()
 
-    # 1. Ładowanie niezbędnych rozszerzeń
+    # 1. Load necessary extensions
     con.execute("INSTALL httpfs; LOAD httpfs;")
     con.execute("INSTALL aws; LOAD aws;")
 
-    # 2. KONFIGURACJA BEZPIECZNA
-    # Zamiast wpisywać klucze ręcznie, nakazujemy DuckDB pobrać je z AWS CLI
+    # 2. SECURE CONFIGURATION
+    # Instead of hardcoding keys, we instruct DuckDB to fetch them from the AWS CLI
     try:
         con.execute("CALL load_aws_credentials();")
-        con.execute("SET s3_region='eu-north-1';")  # Ustawiamy tylko region
+        con.execute("SET s3_region='eu-north-1';")  # Setting the region
     except Exception as e:
-        print(f"❌ Błąd ładowania poświadczeń AWS: {e}")
+        print(f" Error loading AWS credentials: {e}")
         return
 
     bucket = 'moj-projekt-data-lake-nbp'
     full_path = f"s3://{bucket}/raw/nbp_kursy/**/*.parquet"
 
-    print(f"INFO: Łączenie z bucketem: {bucket} w regionie eu-north-1")
+    print(f"INFO: Connecting to bucket: {bucket} in region eu-north-1")
 
     try:
-        # Wykonanie analizy na wszystkich plikach
-        print("\n--- WYNIKI ANALIZY ---")
+        # Perform analysis across all partitioned files
+        print("\n--- ANALYSIS RESULTS ---")
         query = f"""
             SELECT 
                 kod_waluty, 
@@ -38,10 +38,10 @@ def run_analysis():
         """
         df = con.execute(query).df()
         print(df)
-        print("\n✅ Analiza zakończona sukcesem przy użyciu poświadczeń systemowych.")
+        print("\n Analysis completed successfully using system-level credentials.")
 
     except Exception as e:
-        print(f"❌ BŁĄD ANALIZY: {e}")
+        print(f" ANALYSIS ERROR: {e}")
 
 
 if __name__ == "__main__":

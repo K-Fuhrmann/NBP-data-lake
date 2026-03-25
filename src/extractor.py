@@ -3,18 +3,18 @@ import pandas as pd
 from datetime import date, timedelta
 from typing import List
 
-# Adres API NBP dla tabeli A (średnie kursy)
+# NBP API URL for Table A (average exchange rates)
 NBP_API_URL = "http://api.nbp.pl/api/exchangerates/tables/A/"
 
 
 def extract_data_nbp(start_date: date, end_date: date) -> pd.DataFrame:
     """
-    Pobiera dane kursów walut NBP dla zadanego zakresu dat.
+    Fetches NBP exchange rate data for a specified date range.
     """
-    # Budowanie dynamicznego URL dla zakresu dat
+    # Constructing a dynamic URL for the date range
     url = f"{NBP_API_URL}{start_date.isoformat()}/{end_date.isoformat()}/"
 
-    print(f"INFO: Wysyłam zapytanie do API NBP: {url}")
+    print(f"INFO: Sending request to NBP API: {url}")
 
     try:
         response = requests.get(url, headers={'Accept': 'application/json'})
@@ -23,44 +23,44 @@ def extract_data_nbp(start_date: date, end_date: date) -> pd.DataFrame:
 
         all_rates = []
 
-        # Iteracja po każdym dniu zwróconym przez API
+        # Iterating through each day returned by the API
         for daily_table in data:
             exchange_date = daily_table.get('effectiveDate')
             rates = daily_table.get('rates', [])
 
             if rates:
-                # 1. Tworzenie DataFrame dla danego dnia
+                # 1. Creating a DataFrame for the given day
                 rates_df = pd.DataFrame(rates)
-                # 2. Dodanie kolumny z datą notowania
+                # 2. Adding the quotation date column
                 rates_df['DataNotowania'] = exchange_date
 
                 all_rates.append(rates_df)
 
         if not all_rates:
-            print("OSTRZEŻENIE: Brak danych w zwróconym zakresie dat.")
+            print("WARNING: No data found in the returned date range.")
             return pd.DataFrame()
 
-        # Konkatenacja wszystkich DataFrame w jeden płaski zbiór danych
+        # Concatenating all DataFrames into a single flat dataset
         final_df = pd.concat(all_rates, ignore_index=True)
 
-        print(f"INFO: Pomyślnie pobrano i połączono dane z {len(data)} dni.")
+        print(f"INFO: Successfully fetched and combined data from {len(data)} days.")
         return final_df
 
     except requests.exceptions.HTTPError as e:
-        print(f"BŁĄD EXTRACTORA: Błąd HTTP: {e}. Upewnij się, że zakres dat jest poprawny.")
+        print(f"EXTRACTOR ERROR: HTTP Error: {e}. Ensure the date range is correct.")
         return pd.DataFrame()
     except Exception as e:
-        print(f"BŁĄD EXTRACTORA: Nieoczekiwany błąd podczas parsowania JSON: {e}")
+        print(f"EXTRACTOR ERROR: Unexpected error during JSON parsing: {e}")
         return pd.DataFrame()
 
 
 if __name__ == '__main__':
-    # Testowanie modułu: pobranie kursów za ostatnie 7 dni
+    # Module Testing: fetching rates for the last 7 days
     today = date.today()
     one_week_ago = today - timedelta(days=7)
     df_test = extract_data_nbp(one_week_ago, today)
 
     if not df_test.empty:
-        print("\n--- Próbka danych po EKSTRAKCJI (Wiele Dni) ---")
+        print("\n--- Data Sample after EXTRACTION (Multiple Days) ---")
         print(df_test.tail())
-        print(f"\nCałkowita liczba wierszy: {len(df_test)}")
+        print(f"\nTotal row count: {len(df_test)}")

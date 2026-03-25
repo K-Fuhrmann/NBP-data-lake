@@ -4,20 +4,20 @@ import awswrangler as wr
 import logging
 from dotenv import load_dotenv
 
-# Wczytanie zmiennych z .env
+# Loading variables from .env
 load_dotenv()
 
-# Pobranie konfiguracji
+# Loading configuration
 S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
 S3_REGION = os.getenv("S3_REGION")
 S3_BASE_PATH = f"s3://{S3_BUCKET_NAME}/raw/nbp_kursy/"
 
 def load_data_to_s3(df: pd.DataFrame, s3_path: str = S3_BASE_PATH):
     if df.empty:
-        logging.warning("Brak danych do wysłania na S3.")
+        logging.warning("No data to upload to S3.")
         return
 
-    logging.info(f"Rozpoczynam wysyłkę {len(df)} wierszy do AWS S3 na ścieżkę: {s3_path}")
+    logging.info(f"Starting upload of {len(df)} rows to AWS S3 at path: {s3_path}")
 
     try:
         wr.s3.to_parquet(
@@ -26,9 +26,9 @@ def load_data_to_s3(df: pd.DataFrame, s3_path: str = S3_BASE_PATH):
             dataset=True,
             partition_cols=['rok', 'miesiac'],
             mode="append",
-            boto3_session=None # Używa domyślnej sesji AWS CLI
+            boto3_session=None #  AWS CLI
         )
-        logging.info("SUKCES: Dane zostały zapisane w Data Lake.")
+        logging.info("SUCCESS: Data has been written to the Data Lake.")
     except Exception as e:
-        logging.error(f"BŁĄD AWS: Nie udało się wysłać danych. Detale: {e}")
-        raise # Podajemy błąd dalej do main.py
+        logging.error(f"ERROR AWS: Failed to upload data. Details: {e}")
+        raise # Send error to main.py
