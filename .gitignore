@@ -13,7 +13,7 @@ __pycache__/
 *.pyc
 src/__pycache__/
 
-# Dane i logi (lepiej trzymać je lokalnie)
+# Dane i logi 
 data/
 *.log
 src/charts/
